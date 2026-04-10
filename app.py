@@ -65,10 +65,11 @@ if uploaded_file is not None:
         if query.strip():
             st.info("⏳ Analyzing with OpenAI...")
             try:
-                import openai
-                openai.api_key = api_key
+                from openai import OpenAI
                 
-                response = openai.ChatCompletion.create(
+                client = OpenAI(api_key=api_key)
+                
+                response = client.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=[
                         {"role": "system", "content": "You are a medical document analyzer. Provide clear, professional analysis."},
@@ -78,7 +79,7 @@ if uploaded_file is not None:
                     temperature=0.7
                 )
                 
-                answer = response['choices'][0]['message']['content']
+                answer = response.choices[0].message.content
                 st.success("✅ Analysis Complete!")
                 st.write(answer)
                 
