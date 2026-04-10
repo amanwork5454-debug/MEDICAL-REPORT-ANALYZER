@@ -1,19 +1,9 @@
 import streamlit as st
 import PyPDF2
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 st.set_page_config(page_title="Medical Report Analyzer", layout="wide")
 st.title("🏥 Medical Report Analyzer")
-
-# Get API key
-api_key = st.secrets.get("OPENAI_API_KEY") if "OPENAI_API_KEY" in st.secrets else os.getenv("OPENAI_API_KEY")
-
-if not api_key:
-    st.error("⚠️ OpenAI API key not found! Add it to Streamlit Secrets.")
-    st.stop()
 
 # File uploader
 uploaded_file = st.file_uploader('Upload Medical Report (PDF, DOCX, TXT)', type=['pdf', 'docx', 'txt'])
@@ -50,6 +40,8 @@ if uploaded_file is not None:
     elif uploaded_file.name.endswith('.docx'):
         st.warning("📎 DOCX support coming soon!")
         extracted_text = "DOCX processing not yet implemented"
+    else:
+        extracted_text = ""
     
     # Display extracted content
     st.subheader("📋 Extracted Content:")
@@ -63,25 +55,23 @@ if uploaded_file is not None:
     
     if st.button("Analyze with AI", use_container_width=True):
         if query.strip():
-            st.info("⏳ Analyzing with OpenAI...")
+            st.info("⏳ Analyzing document using free AI model...")
             try:
-                from openai import OpenAI
+                from transformers import pipeline
                 
-                client = OpenAI(api_key=api_key)
+                # Load free summarization model
+                summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
                 
-                response = client.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=[
-                        {"role": "system", "content": "You are a medical document analyzer. Provide clear, professional analysis."},
-                        {"role": "user", "content": f"Document content:\n{extracted_text[:2000]}\n\nQuestion: {query}"}
-                    ],
-                    max_tokens=500,
-                    temperature=0.7
-                )
-                
-                answer = response.choices[0].message.content
-                st.success("✅ Analysis Complete!")
-                st.write(answer)
+                # Summarize the extracted text
+                if len(extracted_text) > 100:
+                    summary = summarizer(extracted_text[:1024], max_length=150, min_length=50, do_sample=False)
+                    result = summary[0]['summary_text']
+                    
+                    st.success("✅ Analysis Complete!")
+                    st.write("**Summary:**")
+                    st.write(result)
+                else:
+                    st.warning("Document too short to summarize")
                 
             except Exception as e:
                 st.error(f"Error: {str(e)}")
@@ -89,4 +79,4 @@ if uploaded_file is not None:
             st.warning("Please enter a question!")
 
 st.divider()
-st.markdown("🏥 Medical Report Analyzer | Powered by OpenAI")
+st.markdown("🏥 Medical Report Analyzer | FREE AI Powered | No API Cost Required ✨")
