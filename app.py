@@ -1,14 +1,22 @@
 import streamlit as st
 
-# Title
-st.title('Medical Report Analyzer')
+st.title("Medical Report Analyzer")
 
 # File uploader
 uploaded_file = st.file_uploader('Upload Medical Report', type=['pdf', 'docx', 'txt'])
 
-# Process file
 if uploaded_file is not None:
-    # Display file details
     st.write('File name:', uploaded_file.name)
-    content = uploaded_file.read()
-    st.write('File content:', content.decode('utf-8') if isinstance(content, bytes) else content)
+    
+    # Handle different file types
+    if uploaded_file.name.endswith('.pdf'):
+        st.info("PDF uploaded. Processing...")
+        # PDF processing logic here
+    elif uploaded_file.name.endswith('.docx'):
+        st.info("DOCX uploaded. Processing...")
+        # DOCX processing logic here
+    elif uploaded_file.name.endswith('.txt'):
+        content = uploaded_file.read().decode('utf-8')
+        st.write('File content:', content)
+    else:
+        st.error("Unsupported file type")
