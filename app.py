@@ -12,9 +12,3 @@ if uploaded_file is not None:
     st.write('File name:', uploaded_file.name)
     content = uploaded_file.read()
     st.write('File content:', content.decode('utf-8') if isinstance(content, bytes) else content)
-
-# Add additional features here
-
-# Run the app
-if __name__ == '__main__':
-    st.run()
