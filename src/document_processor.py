@@ -27,7 +27,7 @@ class DocumentProcessor:
     def process_txt(self):
         if not self.file_path.endswith('.txt'):
             raise ValueError('File is not a TXT')
-        with open(self.file_path, 'r') as file:
+        with open(self.file_path, 'r', encoding='utf-8') as file:
             text = file.read()
         return text
 
