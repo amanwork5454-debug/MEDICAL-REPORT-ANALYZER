@@ -12,7 +12,7 @@ class DocumentProcessor:
         with pdfplumber.open(self.file_path) as pdf:
             text = ''
             for page in pdf.pages:
-                text += page.extract_text() + '\n'
+                text += (page.extract_text() or '') + '\n'
         return text
 
     def process_docx(self):
@@ -21,7 +21,7 @@ class DocumentProcessor:
         doc = docx.Document(self.file_path)
         text = ''
         for paragraph in doc.paragraphs:
-            text += paragraph.text + '\n'
+            text += (paragraph.text or '') + '\n'
         return text
 
     def process_txt(self):

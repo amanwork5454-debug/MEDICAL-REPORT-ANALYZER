@@ -6,13 +6,13 @@ class EmbeddingsManager:
     def __init__(self, model_name='all-MiniLM-L6-v2'):
         self.model = SentenceTransformer(model_name)
         self.index = None
-        self.embeddings = []
+        self.embeddings = None
 
     def encode_documents(self, documents):
         self.embeddings = self.model.encode(documents, convert_to_tensor=True)
 
     def build_faiss_index(self):
-        if self.embeddings:
+        if self.embeddings is not None and self.embeddings.shape[0] > 0:
             self.index = faiss.IndexFlatL2(self.embeddings.shape[1])
             self.index.add(np.array(self.embeddings.cpu()))
 
